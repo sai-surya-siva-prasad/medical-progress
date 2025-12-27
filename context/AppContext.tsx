@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AppData, Subject, DailyLog, LogStatus, UserProfile, LogEntry } from '../types';
 import { getDateKey } from '../utils/helpers';
 import { format } from 'date-fns';
@@ -40,14 +40,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     startDate: format(new Date(), 'yyyy-MM-dd'),
   });
 
+  const clearAppState = useCallback(() => {
+    setUser(null);
+    setProfile(null);
+    setData({
+      version: '4.0',
+      subjects: [],
+      logs: {},
+      coins: {},
+      totalCoins: 0,
+      examDate: null,
+      startDate: format(new Date(), 'yyyy-MM-dd'),
+    });
+  }, []);
+
   useEffect(() => {
-    // Robust session check with safety timeout
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          // If the token is invalid or missing, clear everything
+          if (error.message.toLowerCase().includes('refresh token') || error.message.toLowerCase().includes('not found')) {
+            console.warn("Zenith Protocol: Stale session detected. Clearing auth cache.");
+            await supabase.auth.signOut();
+            clearAppState();
+          } else {
+            console.error("Auth session error:", error);
+          }
+          setUser(null);
+        } else {
+          setUser(session?.user ?? null);
+        }
       } catch (e) {
-        console.error("Auth initialization failed", e);
+        console.error("Critical auth initialization failure:", e);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -55,16 +82,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (!session) {
-        setProfile(null);
-        setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT' || event === 'USER_UPDATED' && !session) {
+        clearAppState();
+      } else if (session?.user) {
+        setUser(session.user);
       }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [clearAppState]);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -335,6 +363,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    clearAppState();
   };
 
   return (
