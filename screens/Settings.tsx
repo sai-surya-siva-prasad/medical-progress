@@ -69,7 +69,7 @@ const Settings: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `medsprint-backup-${format(new Date(), 'yyyyMMdd')}.json`;
+    a.download = `zenith-backup-${format(new Date(), 'yyyyMMdd')}.json`;
     a.click();
   };
 
@@ -257,7 +257,7 @@ const Settings: React.FC = () => {
       {/* Brand Footer */}
       <section className="bg-sky-950/40 rounded-[3.5rem] p-16 text-white relative overflow-hidden shadow-2xl border border-sky-500/10 text-center space-y-8">
         <div className="relative z-10 space-y-4">
-          <h3 className="text-3xl font-serif-premium font-light tracking-tight leading-none">MedSprint <span className="text-sky-500">Elite</span></h3>
+          <h3 className="text-3xl font-serif-premium font-light tracking-tight leading-none">Zenith <span className="text-sky-500">Clinical</span></h3>
           <p className="text-[10px] font-black text-sky-400/60 uppercase tracking-luxury">System Integration v4.1</p>
         </div>
         <p className="relative z-10 text-sm text-sky-100/40 leading-relaxed font-medium px-4">

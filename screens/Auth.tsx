@@ -71,7 +71,7 @@ const Auth: React.FC = () => {
             MEDICINE
           </h1>
           <p className="text-[10px] font-black text-slate-600 uppercase tracking-luxury pt-6 ml-1">
-            MEDSPRINT CLINICAL PROTOCOL V4.0
+            ZENITH CLINICAL PROTOCOL V4.0
           </p>
         </div>
 
@@ -174,7 +174,7 @@ const Auth: React.FC = () => {
                   {loading ? (
                     <Loader2 className="animate-spin" size={18} />
                   ) : (
-                    isSignUp ? 'Initialize Intelligence' : 'Begin Session'
+                    isSignUp ? 'Initialize Zenith' : 'Begin Session'
                   )}
                 </button>
               </form>
