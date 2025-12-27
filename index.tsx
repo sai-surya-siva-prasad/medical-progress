@@ -14,3 +14,12 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Remove initial HTML loader once React takes over
+const loader = document.getElementById('initial-loader');
+if (loader) {
+  setTimeout(() => {
+    loader.style.opacity = '0';
+    setTimeout(() => loader.remove(), 500);
+  }, 100);
+}

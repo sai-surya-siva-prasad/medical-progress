@@ -41,10 +41,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (!session) setLoading(false);
-    });
+    // Robust session check with safety timeout
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+      } catch (e) {
+        console.error("Auth initialization failed", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
@@ -63,7 +72,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setLoading(true);
       
       try {
-        const { data: userData } = await supabase.from('med_users').select('*').eq('id', user.id).single();
+        const { data: userData, error: userErr } = await supabase.from('med_users').select('*').eq('id', user.id).single();
         const { data: subjectData } = await supabase.from('med_subjects').select('*').eq('user_id', user.id);
         const { data: progressData } = await supabase.from('med_progress').select('*').eq('user_id', user.id).order('date', { ascending: false });
         const { data: coinsData } = await supabase.from('med_coins').select('*').eq('user_id', user.id);
@@ -119,7 +128,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!user) return;
     const currentDayCoins = (data.coins[date] || 0) + amount;
     
-    // UPSERT coins for the day
     const { error } = await supabase.from('med_coins').upsert({
       user_id: user.id,
       date: date,
@@ -284,7 +292,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         }));
 
-        // Reward 10 coins per chapter
         await awardCoins(dateKey, 10);
       }
     } catch (err: any) {
@@ -307,7 +314,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
         return { ...prev, logs: newLogs };
       });
-      // Deduct coins if log deleted
       await awardCoins(date, -10);
     } finally {
       setSyncing(false);
