@@ -64,7 +64,7 @@ const TodayLog: React.FC = () => {
         </div>
       </header>
 
-      {/* Grid-Based Module Inventory */}
+      {/* High-Density Matrix View */}
       <div className="space-y-12 px-1">
         {data.subjects.length === 0 ? (
           <div className="py-24 text-center glass-card rounded-[3rem] border border-dashed border-white/10">
@@ -87,24 +87,24 @@ const TodayLog: React.FC = () => {
             const progressPercent = Math.round((completedSet.size / subject.totalChapters) * 100);
 
             return (
-              <div key={subject.id} className="space-y-6">
+              <div key={subject.id} className="space-y-4">
                 {/* Module Header */}
                 <div className="flex justify-between items-end px-2">
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="flex items-center space-x-2">
-                      <h3 className="text-2xl font-black text-white tracking-tighter leading-none uppercase">{subject.name}</h3>
-                      <div className="px-2 py-0.5 bg-sky-500/10 border border-sky-500/20 rounded-md">
-                        <span className="text-[8px] font-black text-sky-400 uppercase tracking-widest">{progressPercent}%</span>
+                      <h3 className="text-xl font-black text-white tracking-tighter leading-none uppercase">{subject.name}</h3>
+                      <div className="px-1.5 py-0.5 bg-sky-500/10 border border-sky-500/20 rounded">
+                        <span className="text-[7px] font-black text-sky-400 uppercase tracking-widest">{progressPercent}%</span>
                       </div>
                     </div>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                      Mastery Status: {completedSet.size}/{subject.totalChapters}
+                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                      Registry: {completedSet.size}/{subject.totalChapters}
                     </p>
                   </div>
                 </div>
 
-                {/* Unit Matrix Grid */}
-                <div className="grid grid-cols-6 sm:grid-cols-8 gap-2.5">
+                {/* Dense Unit Grid Matrix */}
+                <div className="grid grid-cols-10 sm:grid-cols-12 gap-1.5">
                   {chapters.map(ch => {
                     const isCompleted = completedSet.has(ch);
                     const isToday = !!logMap[ch];
@@ -116,23 +116,23 @@ const TodayLog: React.FC = () => {
                         onClick={(e) => handleToggleUnit(subject.id, ch, isToday, logMap[ch], e)}
                         disabled={syncing && !isProcessing}
                         className={`
-                          aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-300 relative overflow-hidden group
+                          aspect-square rounded-lg flex flex-col items-center justify-center transition-all duration-300 relative overflow-hidden group
                           ${isCompleted 
-                            ? 'bg-emerald-500 text-white shadow-[0_5px_15px_-5px_rgba(16,185,129,0.4)] scale-100' 
-                            : 'bg-white/5 border border-white/10 text-slate-500 active:scale-90'
+                            ? 'bg-emerald-500 text-white shadow-[0_2px_8px_-2px_rgba(16,185,129,0.4)] scale-100' 
+                            : 'bg-white/5 border border-white/5 text-slate-600 hover:border-white/20 active:scale-90'
                           }
-                          ${isProcessing ? 'animate-pulse bg-emerald-400' : ''}
-                          ${!isCompleted && ch === Math.min(...chapters.filter(c => !completedSet.has(c))) ? 'ring-2 ring-sky-500/50 ring-offset-2 ring-offset-[#020617]' : ''}
+                          ${isProcessing ? 'animate-pulse bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.6)]' : ''}
+                          ${!isCompleted && ch === Math.min(...chapters.filter(c => !completedSet.has(c))) ? 'ring-1 ring-sky-500/50 ring-offset-1 ring-offset-[#020617]' : ''}
                         `}
                       >
                         {isCompleted ? (
-                          <CheckCircle2 size={14} strokeWidth={3} className="animate-in zoom-in duration-300" />
+                          <CheckCircle2 size={10} strokeWidth={4} className="animate-in zoom-in duration-300" />
                         ) : (
-                          <span className="text-[10px] font-bold mono">{ch}</span>
+                          <span className="text-[7px] font-black mono">{ch}</span>
                         )}
                         
-                        {/* Interactive Sparkle */}
-                        <div className="absolute inset-0 bg-white opacity-0 group-active:opacity-20 transition-opacity" />
+                        {/* Interactive Ripple Effect */}
+                        <div className="absolute inset-0 bg-white opacity-0 group-active:opacity-10 transition-opacity" />
                       </button>
                     );
                   })}
@@ -147,19 +147,19 @@ const TodayLog: React.FC = () => {
       {activeRewards.map(reward => (
         <div 
           key={reward.id}
-          className="fixed pointer-events-none z-[100] flex items-center space-x-2 bg-amber-500 text-amber-950 px-3 py-1.5 rounded-full font-black text-[10px] uppercase shadow-xl animate-out fade-out slide-out-to-top-16 duration-1000"
+          className="fixed pointer-events-none z-[100] flex items-center space-x-1.5 bg-amber-500 text-amber-950 px-2 py-1 rounded-full font-black text-[9px] uppercase shadow-xl animate-out fade-out slide-out-to-top-12 duration-1000"
           style={{ left: reward.x, top: reward.y - 20, transform: 'translateX(-50%)' }}
         >
-          <Coins size={12} />
+          <Coins size={10} />
           <span>+10</span>
         </div>
       ))}
 
-      {/* Background Hint */}
-      <div className="fixed bottom-24 left-0 right-0 px-8 pointer-events-none opacity-20">
-        <div className="flex items-center justify-center space-x-3 text-[8px] font-black text-slate-500 uppercase tracking-luxury">
-          <span>Toggle units to update protocol</span>
-          <ChevronRight size={10} />
+      {/* Navigation Instruction */}
+      <div className="fixed bottom-24 left-0 right-0 px-8 pointer-events-none opacity-30">
+        <div className="flex items-center justify-center space-x-2 text-[7px] font-black text-slate-600 uppercase tracking-luxury">
+          <span>Toggle cells to secure units</span>
+          <ChevronRight size={8} />
         </div>
       </div>
     </div>
